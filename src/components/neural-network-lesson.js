@@ -268,10 +268,12 @@ class NeuralNetworkLesson extends HTMLElement {
   // Right panel: neural network SVG
   // ==========================================================
   renderRightPanel() {
+    const m = getMessages(this.locale);
+    const nn = m.neuralNetwork;
     const s = this.step;
     if (s === 0) {
       return `<svg viewBox="0 0 ${L.vw} ${L.vh}" style="max-width:100%;display:block;">
-        <text x="${L.vw / 2}" y="${L.vh / 2}" class="nn-placeholder">How does a computer see this?</text>
+        <text x="${L.vw / 2}" y="${L.vh / 2}" class="nn-placeholder">${nn.step0Placeholder}</text>
       </svg>`;
     }
 
@@ -489,7 +491,7 @@ class NeuralNetworkLesson extends HTMLElement {
 
       // Phase 2 (1100ms): Hidden Layer 2 appears
       setTimeout(() => {
-        this.querySelectorAll('[data-h2]').forEach(fadeIn);
+        this.querySelectorAll('[data-h2], [data-layer="h2"]').forEach(fadeIn);
 
         // Phase 3 (2100ms): Input → H1 connections draw
         setTimeout(() => {

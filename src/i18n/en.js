@@ -123,6 +123,7 @@ export const en = {
     copy:
       "A neural network connects multiple neurons into layers. Information flows forward from input to output.",
     // Step-by-step content
+    step0Placeholder: "How does a computer see this?",
     step0Title: "The Digit",
     step0Copy:
       "Here is a handwritten '4'. A computer doesn't see shapes — it sees numbers. Each tiny square is a pixel: paper (white) or ink (dark). Let's build a neural network that learns to recognize this digit.",

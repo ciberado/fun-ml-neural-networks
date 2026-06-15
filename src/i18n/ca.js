@@ -122,6 +122,7 @@ export const ca = {
     title: "Connecta neurones en una xarxa",
     copy:
       "Una xarxa neuronal connecta diverses neurones en capes. La informació flueix cap endavant des de l'entrada fins a la sortida.",
+    step0Placeholder: "Com veu un ordinador això?",
     step0Title: "El Dígit",
     step0Copy:
       "Aquí hi ha un '4' escrit a mà. Un ordinador no ve formes — ve números. Cada quadrat petit és un píxel: paper (blanc) o tinta (fosc). Construïm una xarxa neuronal que aprengui a reconèixer aquest dígit.",

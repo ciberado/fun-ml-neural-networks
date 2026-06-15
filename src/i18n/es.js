@@ -122,6 +122,7 @@ export const es = {
     title: "Conecta neuronas en una red",
     copy:
       "Una red neuronal conecta varias neuronas en capas. La información fluye hacia adelante desde la entrada hasta la salida.",
+    step0Placeholder: "¿Cómo ve una computadora esto?",
     step0Title: "El Dígito",
     step0Copy:
       "Aquí hay un '4' escrito a mano. Una computadora no ve formas — ve números. Cada cuadrado pequeño es un píxel: papel (blanco) o tinta (oscuro). Construyamos una red neuronal que aprenda a reconocer este dígito.",
