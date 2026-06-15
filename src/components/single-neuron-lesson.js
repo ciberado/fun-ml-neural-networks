@@ -6,15 +6,18 @@ import {
 import { computeNeuron } from "../domain/neuron-model.js";
 import {
   DEFAULT_NEURON_STATE,
-  WEIGHT_MIN,
-  WEIGHT_MAX,
-  WEIGHT_STEP,
+  WEIGHT_VALUE_COUNT,
   BIAS_MIN,
   BIAS_MAX,
   BIAS_STEP,
   INPUT_STEP,
   ACTIVATION_TYPES
 } from "../domain/config.js";
+import {
+  indexToWeight,
+  weightToIndex,
+  weightPrecision
+} from "../utils/weight-scale.js";
 import { formatDecimal } from "../utils/formatters.js";
 
 class SingleNeuronLesson extends HTMLElement {
@@ -54,7 +57,15 @@ class SingleNeuronLesson extends HTMLElement {
       return;
     }
 
-    const value = key === "activation" ? el.value : Number(el.value);
+    let value;
+    if (key === "activation") {
+      value = el.value;
+    } else if (key === "weightA" || key === "weightB") {
+      // Slider stores an index (0 … WEIGHT_VALUE_COUNT-1) — convert to actual weight
+      value = indexToWeight(Number(el.value));
+    } else {
+      value = Number(el.value);
+    }
 
     this.state = {
       ...this.state,
@@ -174,7 +185,8 @@ class SingleNeuronLesson extends HTMLElement {
     for (const key of ["weightA", "weightB", "bias"]) {
       const readout = this.querySelector(`[data-neuron-value="${key}"]`);
       if (readout) {
-        readout.textContent = formatDecimal(this.state[key], this.locale, 1);
+        const precision = key === "bias" ? 1 : weightPrecision(this.state[key]);
+        readout.textContent = formatDecimal(this.state[key], this.locale, precision);
       }
     }
 
@@ -182,9 +194,9 @@ class SingleNeuronLesson extends HTMLElement {
     const formulaEl = this.querySelector("[data-neuron-formula]");
     if (formulaEl) {
       formulaEl.textContent = sn.weightedSumFormula(
-        formatDecimal(this.state.weightA, this.locale, 1),
+        formatDecimal(this.state.weightA, this.locale, weightPrecision(this.state.weightA)),
         formatDecimal(this.state.inputA, this.locale, 1),
-        formatDecimal(this.state.weightB, this.locale, 1),
+        formatDecimal(this.state.weightB, this.locale, weightPrecision(this.state.weightB)),
         formatDecimal(this.state.inputB, this.locale, 1),
         formatDecimal(this.state.bias, this.locale, 1),
         formatDecimal(result.z, this.locale, 3)
@@ -245,8 +257,8 @@ class SingleNeuronLesson extends HTMLElement {
         lineB.setAttribute("stroke-width", wBWidth);
       }
 
-      this.setSvgText(svg, '[data-diagram="weightA"]', `w₁=${formatDecimal(this.state.weightA, this.locale, 1)}`);
-      this.setSvgText(svg, '[data-diagram="weightB"]', `w₂=${formatDecimal(this.state.weightB, this.locale, 1)}`);
+      this.setSvgText(svg, '[data-diagram="weightA"]', `w₁=${formatDecimal(this.state.weightA, this.locale, weightPrecision(this.state.weightA))}`);
+      this.setSvgText(svg, '[data-diagram="weightB"]', `w₂=${formatDecimal(this.state.weightB, this.locale, weightPrecision(this.state.weightB))}`);
       this.setSvgText(svg, '[data-diagram="bias"]', `b=${formatDecimal(this.state.bias, this.locale, 1)}`);
       this.setSvgText(svg, '[data-diagram="z"]', `z=${formatDecimal(result.z, this.locale, 3)}`);
       this.setSvgText(svg, '[data-diagram="activation"]', isSigmoid ? "σ(z)" : "step(z)");
@@ -326,12 +338,12 @@ class SingleNeuronLesson extends HTMLElement {
                     class="neuron-range"
                     type="range"
                     data-neuron-param="weightA"
-                    min="${WEIGHT_MIN}"
-                    max="${WEIGHT_MAX}"
-                    step="${WEIGHT_STEP}"
-                    value="${this.state.weightA}"
+                    min="0"
+                    max="${WEIGHT_VALUE_COUNT - 1}"
+                    step="1"
+                    value="${weightToIndex(this.state.weightA)}"
                   >
-                   <span class="neuron-slider-value" data-neuron-value="weightA">${formatDecimal(this.state.weightA, this.locale, 1)}</span>
+                   <span class="neuron-slider-value" data-neuron-value="weightA">${formatDecimal(this.state.weightA, this.locale, weightPrecision(this.state.weightA))}</span>
                 </div>
               </label>
               <label class="neuron-label">
@@ -341,12 +353,12 @@ class SingleNeuronLesson extends HTMLElement {
                     class="neuron-range"
                     type="range"
                     data-neuron-param="weightB"
-                    min="${WEIGHT_MIN}"
-                    max="${WEIGHT_MAX}"
-                    step="${WEIGHT_STEP}"
-                    value="${this.state.weightB}"
+                    min="0"
+                    max="${WEIGHT_VALUE_COUNT - 1}"
+                    step="1"
+                    value="${weightToIndex(this.state.weightB)}"
                   >
-                  <span class="neuron-slider-value" data-neuron-value="weightB">${formatDecimal(this.state.weightB, this.locale, 1)}</span>
+                  <span class="neuron-slider-value" data-neuron-value="weightB">${formatDecimal(this.state.weightB, this.locale, weightPrecision(this.state.weightB))}</span>
                 </div>
               </label>
             </div>
@@ -422,9 +434,9 @@ class SingleNeuronLesson extends HTMLElement {
                 <div class="neuron-formula-title">${sn.weightedSumLabel}</div>
                 <div class="neuron-formula-body" data-neuron-formula>
                   ${sn.weightedSumFormula(
-                    formatDecimal(this.state.weightA, this.locale, 1),
+                    formatDecimal(this.state.weightA, this.locale, weightPrecision(this.state.weightA)),
                     formatDecimal(this.state.inputA, this.locale, 1),
-                    formatDecimal(this.state.weightB, this.locale, 1),
+                    formatDecimal(this.state.weightB, this.locale, weightPrecision(this.state.weightB)),
                     formatDecimal(this.state.inputB, this.locale, 1),
                     formatDecimal(this.state.bias, this.locale, 1),
                     formatDecimal(result.z, this.locale, 3)
@@ -504,11 +516,11 @@ class SingleNeuronLesson extends HTMLElement {
 
       <!-- Weight line A -->
       <line x1="86" y1="50" x2="174" y2="80" class="neuron-weight-line" stroke="${wAColor}" stroke-width="${wAWidth}" marker-end="url(#arrow)" data-diagram="weightLineA"/>
-      <text x="130" y="60" class="neuron-weight-label" data-diagram="weightA" text-anchor="middle" dominant-baseline="central">w₁=${formatDecimal(weightA, this.locale, 1)}</text>
+      <text x="130" y="60" class="neuron-weight-label" data-diagram="weightA" text-anchor="middle" dominant-baseline="central">w₁=${formatDecimal(weightA, this.locale, weightPrecision(weightA))}</text>
 
       <!-- Weight line B -->
       <line x1="86" y1="134" x2="174" y2="114" class="neuron-weight-line" stroke="${wBColor}" stroke-width="${wBWidth}" marker-end="url(#arrow)" data-diagram="weightLineB"/>
-      <text x="130" y="138" class="neuron-weight-label" data-diagram="weightB" text-anchor="middle" dominant-baseline="central">w₂=${formatDecimal(weightB, this.locale, 1)}</text>
+      <text x="130" y="138" class="neuron-weight-label" data-diagram="weightB" text-anchor="middle" dominant-baseline="central">w₂=${formatDecimal(weightB, this.locale, weightPrecision(weightB))}</text>
 
       <!-- Neuron body -->
       <circle cx="210" cy="97" r="36" class="neuron-body${isActivated ? " is-activated" : ""}"/>

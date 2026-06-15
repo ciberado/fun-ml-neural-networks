@@ -5,7 +5,8 @@ export function formatDecimal(value, locale = "en", fractionDigits = 3) {
     return getMessages(locale).common.unknown;
   }
 
-  return new Intl.NumberFormat(getMessages(locale).meta.intlLocale, {
+  // Always use "." as decimal separator regardless of UI locale
+  return new Intl.NumberFormat("en-US", {
     style: "decimal",
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits
@@ -17,7 +18,8 @@ export function formatInteger(value, locale = "en") {
     return getMessages(locale).common.unknown;
   }
 
-  return new Intl.NumberFormat(getMessages(locale).meta.intlLocale, {
+  // Always use "." as decimal separator regardless of UI locale
+  return new Intl.NumberFormat("en-US", {
     style: "decimal",
     maximumFractionDigits: 0
   }).format(value);
