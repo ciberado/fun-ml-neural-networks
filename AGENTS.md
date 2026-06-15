@@ -1,5 +1,36 @@
 # funlessons — fun-ml-neural-networks
 
+## Headless Browser (Playwright / Puppeteer)
+
+This container runs **Ubuntu 26.04**, which Playwright does not officially distribute Chromium builds for. To work around it:
+
+```bash
+# 1. Override the platform check so Playwright downloads Ubuntu 24.04's Chromium
+echo 'export PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64' >> ~/.bashrc
+source ~/.bashrc
+
+# 2. Download Chromium via Playwright
+npx playwright install chrome
+
+# OR install Google Chrome directly (requires sudo)
+# wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+# sudo apt install -y ./google-chrome-stable_current_amd64.deb
+```
+
+Once either Playwright Chrome or Google Chrome is installed, you can:
+
+```bash
+# Playwright script (CommonJS)
+cd /tmp && npm install playwright
+node my-script.cjs
+
+# Or Puppeteer (bundles its own Chromium)
+cd /tmp && npm install puppeteer
+node my-puppeteer-script.cjs
+```
+
+**Note:** `waitUntil: 'networkidle'` is deprecated in newer Puppeteer — use `'networkidle0'` instead.
+
 ## Build / Test / Lint
 
 ```bash

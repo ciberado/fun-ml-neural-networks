@@ -790,7 +790,7 @@ select {
   grid-template-columns: 35% 65%;
   gap: 16px;
   margin: 20px auto 0;
-  padding: 0 34px;
+  padding: 0 32px;
   max-width: 100%;
 }
 
